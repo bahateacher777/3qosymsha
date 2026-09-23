@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30 Күндік Ағылшын Тілі Сөздік Қорын Дамыту Платформасы</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        indigo: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .card-flip {
+            perspective: 1000px;
+        }
+        .card-inner {
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .card-flip.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12 flex flex-col">
+
+    <!-- Header / Nav -->
+    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-2.5 rounded-xl border border-white/20">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-indigo-200"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold leading-tight">30 Күндік Сөздік Қор Эксперименті</h1>
+                    <p class="text-xs text-indigo-200">5-сынып оқушыларына арналған интерактивті платформа (300 сөз)</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex bg-indigo-900/60 p-1 rounded-xl border border-indigo-400/30 text-xs sm:text-sm">
+                <button id="tab-learn" onclick="switchTab('learn')" class="px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 bg-white text-indigo-900 shadow">
+                    <i class="fa-solid fa-book-open"></i> Сөздік & Флешкарта
+                </button>
+                <button id="tab-test" onclick="switchTab('test')" class="px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 text-indigo-100 hover:text-white">
+                    <i class="fa-solid fa-pen-to-square"></i> Тест тапсыру
+                </button>
+                <button id="tab-dashboard" onclick="switchTab('dashboard')" class="px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 text-indigo-100 hover:text-white">
+                    <i class="fa-solid fa-chart-column"></i> Нәтижелер
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 mt-6 flex-1 w-full">
+
+        <!-- VIEW 1: VOCABULARY STUDY & FLASHCARDS -->
+        <section id="view-learn" class="space-y-6">
+            
+            <!-- Information Banner -->
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="space-y-1">
+                    <span class="px-3 py-1 bg-white/20 text-xs font-bold rounded-full uppercase tracking-wider backdrop-blur-sm">Қосымша 3. 30-күндік бағдарлама</span>
+                    <h2 class="text-xl font-bold">300 Ағылшын сөзін меңгеру бағдарламасы</h2>
+                    <p class="text-xs sm:text-sm text-indigo-100">Күн сайын 10 сөз жаттау арқылы 30 күнде сөздік қорды 300 сөзге кеңейту</p>
+                </div>
+                <div class="flex items-center gap-2 bg-white/10 p-2 rounded-xl backdrop-blur-md">
+                    <button id="mode-list-btn" onclick="setLearnView('list')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-indigo-900 shadow">
+                        <i class="fa-solid fa-list mr-1"></i> Тізім
+                    </button>
+                    <button id="mode-cards-btn" onclick="setLearnView('cards')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white hover:bg-white/10">
+                        <i class="fa-solid fa-clone mr-1"></i> Флешкарталар
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <div class="w-full sm:w-1/2 flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-500 whitespace-nowrap"><i class="fa-solid fa-filter text-indigo-600"></i> Тақырып:</label>
+                    <select id="topic-select" onchange="filterWords()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="all">Барлық тақырыптар (300 сөз / 30 күн)</option>
+                        <option value="family">1–5 күн: Family & School (50 сөз)</option>
+                        <option value="routine">6–10 күн: Daily Routine (50 сөз)</option>
+                        <option value="food">11–15 күн: Food and Drinks (50 сөз)</option>
+                        <option value="hobby">16–20 күн: Hobbies and Sport (50 сөз)</option>
+                        <option value="nature">21–25 күн: Nature and Weather (50 сөз)</option>
+                        <option value="travel">26–30 күн: Travel & Everyday English (50 сөз)</option>
+                    </select>
+                </div>
+                <div class="w-full sm:w-1/2 relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                    <input type="text" id="search-input" onkeyup="filterWords()" placeholder="Сөзді іздеу (ағылшынша немесе қазақша)..." class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+            </div>
+
+            <!-- Words Grid / List Container -->
+            <div id="words-list-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                <!-- JS Populated -->
+            </div>
+
+            <!-- Flashcards View Container (Hidden by default) -->
+            <div id="words-cards-container" class="hidden flex flex-col items-center justify-center space-y-6 py-8">
+                <div id="flashcard" class="card-flip w-full max-w-md h-64 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="card-inner w-full h-full relative rounded-2xl shadow-xl bg-white border border-indigo-100 flex items-center justify-center p-6 text-center">
+                        <div class="card-front absolute inset-0 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-indigo-50/50 to-white rounded-2xl">
+                            <span class="text-xs font-bold uppercase tracking-wider text-indigo-500 mb-2" id="card-topic">Family</span>
+                            <h3 class="text-3xl font-extrabold text-slate-800 mb-4" id="card-eng">Family</h3>
+                            <button onclick="event.stopPropagation(); speakWord(document.getElementById('card-eng').innerText)" class="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-full text-xs font-bold transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-volume-high"></i> Дыбыстау
+                            </button>
+                            <p class="text-[11px] text-slate-400 mt-6"><i class="fa-solid fa-rotate"></i> Картаны аудару үшін басыңыз</p>
+                        </div>
+                        <div class="card-back absolute inset-0 flex flex-col items-center justify-center p-6 bg-indigo-600 text-white rounded-2xl">
+                            <span class="text-xs uppercase tracking-wider text-indigo-200 mb-2">Қазақша аудармасы</span>
+                            <h3 class="text-3xl font-bold mb-4" id="card-kaz">Отбасы</h3>
+                            <span class="text-xs bg-white/20 px-3 py-1 rounded-full" id="card-counter">1 / 300</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button onclick="prevCard()" class="px-5 py-2.5 bg-white border border-slate-300 rounded-xl text-slate-700 hover:bg-slate-50 font-bold text-sm shadow-sm transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Алдыңғы
+                    </button>
+                    <button onclick="nextCard()" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-bold text-sm shadow-md transition-all flex items-center gap-2">
+                        Келесі <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- VIEW 2: STUDENT TEST SECTION -->
+        <section id="view-test" class="hidden space-y-6">
+            
+            <!-- Research Header Box -->
+            <div class="bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <div class="hidden sm:flex bg-indigo-600 text-white p-3 rounded-xl shadow-md text-xl">
+                        <i class="fa-solid fa-flask"></i>
+                    </div>
+                    <div class="space-y-2 flex-1">
+                        <div class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-semibold rounded-full uppercase tracking-wider">
+                            Педагогикалық эксперимент • Қорытынды тест
+                        </div>
+                        <h2 class="text-lg md:text-xl font-bold text-slate-800 leading-snug">
+                            Зерттеу тақырыбы: «Күн сайын 10 ағылшын сөзін жаттау арқылы оқушылардың сөздік қорын дамытудың тиімділігі»
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-600">
+                            <span class="font-semibold text-slate-700">Мақсаты:</span> 30 күндік бағдарламадан (300 сөз) кейін 5-сынып оқушыларының сөздік қорын анықтау.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Metadata Form -->
+            <form id="quiz-form" onsubmit="event.preventDefault(); submitQuiz();" class="space-y-8">
+                
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <h3 class="text-md font-bold text-slate-700 border-b pb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-user-gear text-indigo-600"></i> Оқушы туралы мәлімет
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Оқушының аты-жөні *</label>
+                            <input type="text" id="student-name" required placeholder="Мысалы: Асанәлі Ахметов" 
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Сыныбы *</label>
+                            <input type="text" id="student-class" required placeholder="5 «А»" 
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Күні</label>
+                            <input type="date" id="test-date" 
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-slate-50">
+                        </div>
+                    </div>
+
+                    <!-- Group Selection -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-2">Зерттеу тобын таңдаңыз *</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-all hover:border-indigo-300 bg-white">
+                                <input type="radio" name="student-group" value="Эксперименттік топ" required class="text-indigo-600 focus:ring-indigo-500">
+                                <div>
+                                    <span class="block text-sm font-semibold text-slate-800">Эксперименттік топ</span>
+                                    <span class="block text-xs text-slate-500">Күн сайын 10 сөз жаттау әдісі қолданылды</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-all hover:border-indigo-300 bg-white">
+                                <input type="radio" name="student-group" value="Бақылау тобы" required class="text-indigo-600 focus:ring-indigo-500">
+                                <div>
+                                    <span class="block text-sm font-semibold text-slate-800">Бақылау тобы</span>
+                                    <span class="block text-xs text-slate-500">Дәстүрлі оқыту бағдарламасы бойынша</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Instructions Card -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 flex items-start gap-3">
+                        <i class="fa-solid fa-circle-info text-amber-600 text-lg mt-0.5"></i>
+                        <div>
+                            <p class="font-bold mb-0.5">Нұсқаулық:</p>
+                            <p>Тест 30 тапсырмадан тұрады (Максималды нәтиже – 30 балл). Әр дұрыс жауапқа – 1 балл. Ағылшынша сөздің жанындағы <i class="fa-solid fa-volume-high text-indigo-600"></i> батырмасын басып сөздің айтылуын тыңдай аласыз.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 1 Section -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <h3 class="text-base font-bold text-slate-800">
+                            1-тапсырма. Ағылшын сөздерін қазақ тіліне аудар
+                        </h3>
+                        <span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">10 ұпай</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="task1-container">
+                        <!-- JS populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Task 2 Section -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <h3 class="text-base font-bold text-slate-800">
+                            2-тапсырма. Дұрыс аударманы таңда
+                        </h3>
+                        <span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">10 ұпай</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="task2-container">
+                        <!-- JS populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Task 3 Section -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">
+                                3-тапсырма. Сөздерді ағылшын тіліне аудар және сөйлем жаз
+                            </h3>
+                            <p class="text-xs text-slate-500">Сөзді ағылшынша жазып, сол сөзді қатыстырып сөйлем құрастырыңыз.</p>
+                        </div>
+                        <span class="px-2.5 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">10 балл</span>
+                    </div>
+
+                    <div class="space-y-4" id="task3-container">
+                        <!-- JS populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Тестті аяқтау және нәтижені жіберу
+                </button>
+            </form>
+
+            <!-- Result Modal / Card -->
+            <div id="result-modal" class="hidden bg-white border border-indigo-200 rounded-2xl p-6 shadow-xl space-y-6">
+                <div class="text-center space-y-2 border-b pb-4">
+                    <div id="result-badge" class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 text-3xl mb-2">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800" id="result-title">Тест аяқталды!</h3>
+                    <p class="text-slate-600 text-sm" id="result-subtitle">Оқушының қорытынды нәтижесі дайын</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div class="p-3 bg-slate-50 rounded-xl border">
+                        <span class="block text-xs text-slate-500 font-medium">1-тапсырма</span>
+                        <span class="text-lg font-bold text-slate-700" id="res-t1">0 / 10</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border">
+                        <span class="block text-xs text-slate-500 font-medium">2-тапсырма</span>
+                        <span class="text-lg font-bold text-slate-700" id="res-t2">0 / 10</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 rounded-xl border">
+                        <span class="block text-xs text-slate-500 font-medium">3-тапсырма</span>
+                        <span class="text-lg font-bold text-slate-700" id="res-t3">0 / 10</span>
+                    </div>
+                    <div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl">
+                        <span class="block text-xs text-indigo-600 font-semibold">Жалпы балл</span>
+                        <span class="text-xl font-black text-indigo-700" id="res-total">0 / 30</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-semibold text-slate-600">Меңгеру деңгейі:</span>
+                        <span id="res-level-tag" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Жоғары</span>
+                    </div>
+                    <p class="text-xs text-slate-600" id="res-description">
+                        Оқушының сөздік қоры жақсы қалыптасқан.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button onclick="resetTest()" class="flex-1 py-2.5 border border-slate-300 text-slate-700 font-medium text-sm rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-left"></i> Қайта тапсыру
+                    </button>
+                    <button onclick="switchTab('dashboard')" class="flex-1 py-2.5 bg-indigo-600 text-white font-medium text-sm rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-list-check"></i> Жалпы кестені қарау
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- VIEW 3: TEACHER DASHBOARD -->
+        <section id="view-dashboard" class="hidden space-y-6">
+            
+            <!-- Dashboard Overview Banner -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-list text-indigo-600"></i> Нәтижені тіркеу кестесі
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Эксперименттік және бақылау топтарының сөздік қорды дамыту қорытындылары</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="addSampleData()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-vial"></i> Үлгі деректерді жүктеу
+                        </button>
+                        <button onclick="exportCSV()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-file-excel"></i> Excel (CSV) экспорттау
+                        </button>
+                        <button onclick="clearResults()" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can"></i> Тазалау
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Group Comparison Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <!-- Experimental Group Summary -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-indigo-100/50 border border-indigo-200 rounded-xl p-4 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold text-indigo-800 uppercase tracking-wide">Эксперименттік топ</span>
+                            <div class="text-2xl font-black text-indigo-900 mt-1" id="exp-avg-score">0.0 / 30</div>
+                            <p class="text-xs text-indigo-700 mt-0.5" id="exp-count">Оқушы саны: 0</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block px-3 py-1 bg-indigo-600 text-white text-sm font-extrabold rounded-lg shadow-sm" id="exp-percent">0%</span>
+                            <p class="text-[11px] text-indigo-700 mt-1 font-medium">Орташа меңгеру</p>
+                        </div>
+                    </div>
+
+                    <!-- Control Group Summary -->
+                    <div class="bg-gradient-to-br from-slate-100 to-slate-200/60 border border-slate-300 rounded-xl p-4 flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Бақылау тобы</span>
+                            <div class="text-2xl font-black text-slate-800 mt-1" id="ctrl-avg-score">0.0 / 30</div>
+                            <p class="text-xs text-slate-600 mt-0.5" id="ctrl-count">Оқушы саны: 0</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block px-3 py-1 bg-slate-700 text-white text-sm font-extrabold rounded-lg shadow-sm" id="ctrl-percent">0%</span>
+                            <p class="text-[11px] text-slate-600 mt-1 font-medium">Орташа меңгеру</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-700 border-collapse">
+                        <thead class="bg-slate-50 text-xs uppercase text-slate-500 border-b font-semibold">
+                            <tr>
+                                <th class="py-3 px-4 w-12 text-center">№</th>
+                                <th class="py-3 px-4">Оқушының аты-жөні</th>
+                                <th class="py-3 px-4">Тобы</th>
+                                <th class="py-3 px-4 text-center">1-тапсырма (/10)</th>
+                                <th class="py-3 px-4 text-center">2-тапсырма (/10)</th>
+                                <th class="py-3 px-4 text-center">3-тапсырма (/10)</th>
+                                <th class="py-3 px-4 text-center">Жалпы балл (/30)</th>
+                                <th class="py-3 px-4 text-center">Деңгей</th>
+                                <th class="py-3 px-4 w-12 text-center"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-table-body" class="divide-y divide-slate-100">
+                            <!-- JS dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="empty-table-msg" class="text-center py-8 text-slate-400 text-sm">
+                    <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300"></i>
+                    <p>Әлі нәтижелер тіркелмеген. Тест тапсырылған соң мұнда көрінеді.</p>
+                </div>
+            </div>
+
+            <!-- Evaluation Criteria Reference Card -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Бағалау критерийлері</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-2">
+                        <span class="px-2 py-0.5 rounded bg-emerald-600 text-white font-bold">25–30 балл</span>
+                        <div>
+                            <strong class="text-emerald-900 block">Жоғары деңгей</strong>
+                            <span class="text-emerald-800">Оқушының сөздік қоры жақсы қалыптасқан.</span>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2">
+                        <span class="px-2 py-0.5 rounded bg-amber-600 text-white font-bold">18–24 балл</span>
+                        <div>
+                            <strong class="text-amber-900 block">Орташа деңгей</strong>
+                            <span class="text-amber-800">Сөздік қоры орташа деңгейде.</span>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-2">
+                        <span class="px-2 py-0.5 rounded bg-rose-600 text-white font-bold">0–17 балл</span>
+                        <div>
+                            <strong class="text-rose-900 block">Төмен деңгей</strong>
+                            <span class="text-rose-800">Сөздік қорын толықтыру қажет.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script>
+        // 300 WORDS DATABASE FROM APPENDIX 3 (30-DAY PROGRAM)
+        const fullVocabulary = [
+            // FAMILY (25)
+            { id: 1, eng: "Family", kaz: "Отбасы", topic: "family", days: "1–5" },
+            { id: 2, eng: "Mother", kaz: "Ана", topic: "family", days: "1–5" },
+            { id: 3, eng: "Father", kaz: "Әке", topic: "family", days: "1–5" },
+            { id: 4, eng: "Parents", kaz: "Ата-ана", topic: "family", days: "1–5" },
+            { id: 5, eng: "Brother", kaz: "Аға / іні", topic: "family", days: "1–5" },
+            { id: 6, eng: "Sister", kaz: "Әпке / сіңлі", topic: "family", days: "1–5" },
+            { id: 7, eng: "Grandmother", kaz: "Әже", topic: "family", days: "1–5" },
+            { id: 8, eng: "Grandfather", kaz: "Ата", topic: "family", days: "1–5" },
+            { id: 9, eng: "Uncle", kaz: "Аға / көке", topic: "family", days: "1–5" },
+            { id: 10, eng: "Aunt", kaz: "Тәте / апай", topic: "family", days: "1–5" },
+            { id: 11, eng: "Cousin", kaz: "Немере / бөлелер", topic: "family", days: "1–5" },
+            { id: 12, eng: "Son", kaz: "Ұл", topic: "family", days: "1–5" },
+            { id: 13, eng: "Daughter", kaz: "Қыз", topic: "family", days: "1–5" },
+            { id: 14, eng: "Child", kaz: "Бала", topic: "family", days: "1–5" },
+            { id: 15, eng: "Baby", kaz: "Нәресте", topic: "family", days: "1–5" },
+            { id: 16, eng: "Husband", kaz: "Күйеу", topic: "family", days: "1–5" },
+            { id: 17, eng: "Wife", kaz: "Әйел / жұбай", topic: "family", days: "1–5" },
+            { id: 18, eng: "Friend", kaz: "Дос", topic: "family", days: "1–5" },
+            { id: 19, eng: "Home", kaz: "Үй", topic: "family", days: "1–5" },
+            { id: 20, eng: "Love", kaz: "Махаббат", topic: "family", days: "1–5" },
+            { id: 21, eng: "Happy", kaz: "Бақытты", topic: "family", days: "1–5" },
+            { id: 22, eng: "Kind", kaz: "Мейірімді", topic: "family", days: "1–5" },
+            { id: 23, eng: "Young", kaz: "Жас", topic: "family", days: "1–5" },
+            { id: 24, eng: "Old", kaz: "Қарт / ескі", topic: "family", days: "1–5" },
+            { id: 25, eng: "Together", kaz: "Бірге", topic: "family", days: "1–5" },
+
+            // SCHOOL (25)
+            { id: 26, eng: "School", kaz: "Мектеп", topic: "family", days: "1–5" },
+            { id: 27, eng: "Teacher", kaz: "Мұғалім", topic: "family", days: "1–5" },
+            { id: 28, eng: "Student", kaz: "Оқушы", topic: "family", days: "1–5" },
+            { id: 29, eng: "Classroom", kaz: "Сынып бөлмесі", topic: "family", days: "1–5" },
+            { id: 30, eng: "Lesson", kaz: "Сабақ", topic: "family", days: "1–5" },
+            { id: 31, eng: "Subject", kaz: "Пән", topic: "family", days: "1–5" },
+            { id: 32, eng: "Book", kaz: "Кітап", topic: "family", days: "1–5" },
+            { id: 33, eng: "Notebook", kaz: "Дәптер", topic: "family", days: "1–5" },
+            { id: 34, eng: "Pencil", kaz: "Қарындаш", topic: "family", days: "1–5" },
+            { id: 35, eng: "Pen", kaz: "Қалам", topic: "family", days: "1–5" },
+            { id: 36, eng: "Ruler", kaz: "Сызғыш", topic: "family", days: "1–5" },
+            { id: 37, eng: "Bag", kaz: "Сөмке", topic: "family", days: "1–5" },
+            { id: 38, eng: "Desk", kaz: "Парта", topic: "family", days: "1–5" },
+            { id: 39, eng: "Chair", kaz: "Орындық", topic: "family", days: "1–5" },
+            { id: 40, eng: "Board", kaz: "Тақта", topic: "family", days: "1–5" },
+            { id: 41, eng: "Library", kaz: "Кітапхана", topic: "family", days: "1–5" },
+            { id: 42, eng: "Homework", kaz: "Үй жұмысы", topic: "family", days: "1–5" },
+            { id: 43, eng: "Test", kaz: "Тест", topic: "family", days: "1–5" },
+            { id: 44, eng: "Question", kaz: "Сұрақ", topic: "family", days: "1–5" },
+            { id: 45, eng: "Answer", kaz: "Жауап", topic: "family", days: "1–5" },
+            { id: 46, eng: "Read", kaz: "Оқу", topic: "family", days: "1–5" },
+            { id: 47, eng: "Write", kaz: "Жазу", topic: "family", days: "1–5" },
+            { id: 48, eng: "Learn", kaz: "Үйрену", topic: "family", days: "1–5" },
+            { id: 49, eng: "Study", kaz: "Оқу / білім алу", topic: "family", days: "1–5" },
+            { id: 50, eng: "Classmate", kaz: "Сыныптас", topic: "family", days: "1–5" },
+
+            // DAILY ROUTINE (50)
+            { id: 51, eng: "Daily routine", kaz: "Күнделікті күн тәртібі", topic: "routine", days: "6–10" },
+            { id: 52, eng: "Wake up", kaz: "Ояну", topic: "routine", days: "6–10" },
+            { id: 53, eng: "Get up", kaz: "Төсектен тұру", topic: "routine", days: "6–10" },
+            { id: 54, eng: "Wash", kaz: "Жуыну", topic: "routine", days: "6–10" },
+            { id: 55, eng: "Brush", kaz: "Тазалау", topic: "routine", days: "6–10" },
+            { id: 56, eng: "Brush my teeth", kaz: "Тісімді тазалау", topic: "routine", days: "6–10" },
+            { id: 57, eng: "Take a shower", kaz: "Душ қабылдау", topic: "routine", days: "6–10" },
+            { id: 58, eng: "Get dressed", kaz: "Киіну", topic: "routine", days: "6–10" },
+            { id: 59, eng: "Comb my hair", kaz: "Шашымды тарау", topic: "routine", days: "6–10" },
+            { id: 60, eng: "Have breakfast", kaz: "Таңғы ас ішу", topic: "routine", days: "6–10" },
+            { id: 61, eng: "Eat", kaz: "Тамақтану", topic: "routine", days: "6–10" },
+            { id: 62, eng: "Drink", kaz: "Ішу", topic: "routine", days: "6–10" },
+            { id: 63, eng: "Go", kaz: "Бару", topic: "routine", days: "6–10" },
+            { id: 64, eng: "Go to school", kaz: "Мектепке бару", topic: "routine", days: "6–10" },
+            { id: 65, eng: "Come", kaz: "Келу", topic: "routine", days: "6–10" },
+            { id: 66, eng: "Come home", kaz: "Үйге келу", topic: "routine", days: "6–10" },
+            { id: 67, eng: "Study", kaz: "Оқу", topic: "routine", days: "6–10" },
+            { id: 68, eng: "Learn", kaz: "Үйрену", topic: "routine", days: "6–10" },
+            { id: 69, eng: "Read", kaz: "Оқу", topic: "routine", days: "6–10" },
+            { id: 70, eng: "Write", kaz: "Жазу", topic: "routine", days: "6–10" },
+            { id: 71, eng: "Listen", kaz: "Тыңдау", topic: "routine", days: "6–10" },
+            { id: 72, eng: "Speak", kaz: "Сөйлеу", topic: "routine", days: "6–10" },
+            { id: 73, eng: "Do homework", kaz: "Үй жұмысын орындау", topic: "routine", days: "6–10" },
+            { id: 74, eng: "Have lunch", kaz: "Түскі ас ішу", topic: "routine", days: "6–10" },
+            { id: 75, eng: "Have dinner", kaz: "Кешкі ас ішу", topic: "routine", days: "6–10" },
+            { id: 76, eng: "Play", kaz: "Ойнау", topic: "routine", days: "6–10" },
+            { id: 77, eng: "Play games", kaz: "Ойын ойнау", topic: "routine", days: "6–10" },
+            { id: 78, eng: "Play football", kaz: "Футбол ойнау", topic: "routine", days: "6–10" },
+            { id: 79, eng: "Watch TV", kaz: "Теледидар көру", topic: "routine", days: "6–10" },
+            { id: 80, eng: "Use a computer", kaz: "Компьютер пайдалану", topic: "routine", days: "6–10" },
+            { id: 81, eng: "Use a phone", kaz: "Телефон пайдалану", topic: "routine", days: "6–10" },
+            { id: 82, eng: "Meet friends", kaz: "Достармен кездесу", topic: "routine", days: "6–10" },
+            { id: 83, eng: "Talk", kaz: "Сөйлесу", topic: "routine", days: "6–10" },
+            { id: 84, eng: "Help", kaz: "Көмектесу", topic: "routine", days: "6–10" },
+            { id: 85, eng: "Help parents", kaz: "Ата-анаға көмектесу", topic: "routine", days: "6–10" },
+            { id: 86, eng: "Clean", kaz: "Тазалау", topic: "routine", days: "6–10" },
+            { id: 87, eng: "Clean my room", kaz: "Бөлмемді жинау", topic: "routine", days: "6–10" },
+            { id: 88, eng: "Cook", kaz: "Тамақ пісіру", topic: "routine", days: "6–10" },
+            { id: 89, eng: "Walk", kaz: "Серуендеу", topic: "routine", days: "6–10" },
+            { id: 90, eng: "Run", kaz: "Жүгіру", topic: "routine", days: "6–10" },
+            { id: 91, eng: "Exercise", kaz: "Жаттығу жасау", topic: "routine", days: "6–10" },
+            { id: 92, eng: "Relax", kaz: "Демалу", topic: "routine", days: "6–10" },
+            { id: 93, eng: "Rest", kaz: "Тынығу", topic: "routine", days: "6–10" },
+            { id: 94, eng: "Read a book", kaz: "Кітап оқу", topic: "routine", days: "6–10" },
+            { id: 95, eng: "Listen to music", kaz: "Музыка тыңдау", topic: "routine", days: "6–10" },
+            { id: 96, eng: "Go outside", kaz: "Далаға шығу", topic: "routine", days: "6–10" },
+            { id: 97, eng: "Go to bed", kaz: "Ұйықтауға жату", topic: "routine", days: "6–10" },
+            { id: 98, eng: "Sleep", kaz: "Ұйықтау", topic: "routine", days: "6–10" },
+            { id: 99, eng: "Evening", kaz: "Кеш", topic: "routine", days: "6–10" },
+            { id: 100, eng: "Morning", kaz: "Таң", topic: "routine", days: "6–10" },
+
+            // FOOD AND DRINKS (50)
+            { id: 101, eng: "Food", kaz: "Тағам", topic: "food", days: "11–15" },
+            { id: 102, eng: "Drink", kaz: "Сусын", topic: "food", days: "11–15" },
+            { id: 103, eng: "Bread", kaz: "Нан", topic: "food", days: "11–15" },
+            { id: 104, eng: "Milk", kaz: "Сүт", topic: "food", days: "11–15" },
+            { id: 105, eng: "Water", kaz: "Су", topic: "food", days: "11–15" },
+            { id: 106, eng: "Juice", kaz: "Шырын", topic: "food", days: "11–15" },
+            { id: 107, eng: "Tea", kaz: "Шай", topic: "food", days: "11–15" },
+            { id: 108, eng: "Coffee", kaz: "Кофе", topic: "food", days: "11–15" },
+            { id: 109, eng: "Apple", kaz: "Алма", topic: "food", days: "11–15" },
+            { id: 110, eng: "Banana", kaz: "Банан", topic: "food", days: "11–15" },
+            { id: 111, eng: "Orange", kaz: "Апельсин", topic: "food", days: "11–15" },
+            { id: 112, eng: "Lemon", kaz: "Лимон", topic: "food", days: "11–15" },
+            { id: 113, eng: "Grape", kaz: "Жүзім", topic: "food", days: "11–15" },
+            { id: 114, eng: "Strawberry", kaz: "Құлпынай", topic: "food", days: "11–15" },
+            { id: 115, eng: "Watermelon", kaz: "Қарбыз", topic: "food", days: "11–15" },
+            { id: 116, eng: "Potato", kaz: "Картоп", topic: "food", days: "11–15" },
+            { id: 117, eng: "Tomato", kaz: "Қызанақ", topic: "food", days: "11–15" },
+            { id: 118, eng: "Cucumber", kaz: "Қияр", topic: "food", days: "11–15" },
+            { id: 119, eng: "Carrot", kaz: "Сәбіз", topic: "food", days: "11–15" },
+            { id: 120, eng: "Cheese", kaz: "Ірімшік / Сыр", topic: "food", days: "11–15" },
+            { id: 121, eng: "Butter", kaz: "Сары май", topic: "food", days: "11–15" },
+            { id: 122, eng: "Meat", kaz: "Ет", topic: "food", days: "11–15" },
+            { id: 123, eng: "Chicken", kaz: "Тауық еті", topic: "food", days: "11–15" },
+            { id: 124, eng: "Fish", kaz: "Балық", topic: "food", days: "11–15" },
+            { id: 125, eng: "Egg", kaz: "Жұмыртқа", topic: "food", days: "11–15" },
+            { id: 126, eng: "Rice", kaz: "Күріш", topic: "food", days: "11–15" },
+            { id: 127, eng: "Soup", kaz: "Көже / Сорпа", topic: "food", days: "11–15" },
+            { id: 128, eng: "Pizza", kaz: "Пицца", topic: "food", days: "11–15" },
+            { id: 129, eng: "Burger", kaz: "Бургер", topic: "food", days: "11–15" },
+            { id: 130, eng: "Cake", kaz: "Торт / Бәліш", topic: "food", days: "11–15" },
+            { id: 131, eng: "Ice cream", kaz: "Балмұздақ", topic: "food", days: "11–15" },
+            { id: 132, eng: "Sugar", kaz: "Қант", topic: "food", days: "11–15" },
+            { id: 133, eng: "Salt", kaz: "Тұз", topic: "food", days: "11–15" },
+            { id: 134, eng: "Breakfast", kaz: "Таңғы ас", topic: "food", days: "11–15" },
+            { id: 135, eng: "Lunch", kaz: "Түскі ас", topic: "food", days: "11–15" },
+            { id: 136, eng: "Dinner", kaz: "Кешкі ас", topic: "food", days: "11–15" },
+            { id: 137, eng: "Sweet", kaz: "Тәтті", topic: "food", days: "11–15" },
+            { id: 138, eng: "Tasty", kaz: "Дәмді", topic: "food", days: "11–15" },
+            { id: 139, eng: "Fresh", kaz: "Балғын", topic: "food", days: "11–15" },
+            { id: 140, eng: "Hot", kaz: "Ыстық", topic: "food", days: "11–15" },
+            { id: 141, eng: "Cold", kaz: "Суық", topic: "food", days: "11–15" },
+            { id: 142, eng: "Fruit", kaz: "Жеміс", topic: "food", days: "11–15" },
+            { id: 143, eng: "Vegetable", kaz: "Көкөніс", topic: "food", days: "11–15" },
+            { id: 144, eng: "Sandwich", kaz: "Сэндвич", topic: "food", days: "11–15" },
+            { id: 145, eng: "Chocolate", kaz: "Шоколад", topic: "food", days: "11–15" },
+            { id: 146, eng: "Cookie", kaz: "Печенье", topic: "food", days: "11–15" },
+            { id: 147, eng: "Honey", kaz: "Бал", topic: "food", days: "11–15" },
+            { id: 148, eng: "Oil", kaz: "Май", topic: "food", days: "11–15" },
+            { id: 149, eng: "Pasta", kaz: "Макарон", topic: "food", days: "11–15" },
+            { id: 150, eng: "Salad", kaz: "Салат", topic: "food", days: "11–15" },
+
+            // HOBBIES AND SPORT (50)
+            { id: 151, eng: "Hobby", kaz: "Хобби / Әуестік", topic: "hobby", days: "16–20" },
+            { id: 152, eng: "Sport", kaz: "Спорт", topic: "hobby", days: "16–20" },
+            { id: 153, eng: "Play", kaz: "Ойнау", topic: "hobby", days: "16–20" },
+            { id: 154, eng: "Football", kaz: "Футбол", topic: "hobby", days: "16–20" },
+            { id: 155, eng: "Basketball", kaz: "Баскетбол", topic: "hobby", days: "16–20" },
+            { id: 156, eng: "Volleyball", kaz: "Волейбол", topic: "hobby", days: "16–20" },
+            { id: 157, eng: "Tennis", kaz: "Теннис", topic: "hobby", days: "16–20" },
+            { id: 158, eng: "Chess", kaz: "Шахмат", topic: "hobby", days: "16–20" },
+            { id: 159, eng: "Swimming", kaz: "Жүзу", topic: "hobby", days: "16–20" },
+            { id: 160, eng: "Running", kaz: "Жүгіру", topic: "hobby", days: "16–20" },
+            { id: 161, eng: "Cycling", kaz: "Велосипед тебу", topic: "hobby", days: "16–20" },
+            { id: 162, eng: "Dancing", kaz: "Би билеу", topic: "hobby", days: "16–20" },
+            { id: 163, eng: "Singing", kaz: "Ән айту", topic: "hobby", days: "16–20" },
+            { id: 164, eng: "Drawing", kaz: "Сурет салу", topic: "hobby", days: "16–20" },
+            { id: 165, eng: "Painting", kaz: "Сурет салу (бояумен)", topic: "hobby", days: "16–20" },
+            { id: 166, eng: "Reading", kaz: "Оқу", topic: "hobby", days: "16–20" },
+            { id: 167, eng: "Writing", kaz: "Жазу", topic: "hobby", days: "16–20" },
+            { id: 168, eng: "Fishing", kaz: "Балық аулау", topic: "hobby", days: "16–20" },
+            { id: 169, eng: "Cooking", kaz: "Тамақ пісіру", topic: "hobby", days: "16–20" },
+            { id: 170, eng: "Travelling", kaz: "Саяхаттау", topic: "hobby", days: "16–20" },
+            { id: 171, eng: "Music", kaz: "Музыка", topic: "hobby", days: "16–20" },
+            { id: 172, eng: "Guitar", kaz: "Гитара", topic: "hobby", days: "16–20" },
+            { id: 173, eng: "Piano", kaz: "Пианино", topic: "hobby", days: "16–20" },
+            { id: 174, eng: "Game", kaz: "Ойын", topic: "hobby", days: "16–20" },
+            { id: 175, eng: "Computer game", kaz: "Компьютерлік ойын", topic: "hobby", days: "16–20" },
+            { id: 176, eng: "Team", kaz: "Команда", topic: "hobby", days: "16–20" },
+            { id: 177, eng: "Player", kaz: "Ойыншы", topic: "hobby", days: "16–20" },
+            { id: 178, eng: "Winner", kaz: "Жеңімпаз", topic: "hobby", days: "16–20" },
+            { id: 179, eng: "Match", kaz: "Матч / Ойын", topic: "hobby", days: "16–20" },
+            { id: 180, eng: "Ball", kaz: "Доп", topic: "hobby", days: "16–20" },
+            { id: 181, eng: "Jump", kaz: "Секіру", topic: "hobby", days: "16–20" },
+            { id: 182, eng: "Run", kaz: "Жүгіру", topic: "hobby", days: "16–20" },
+            { id: 183, eng: "Swim", kaz: "Жүзу", topic: "hobby", days: "16–20" },
+            { id: 184, eng: "Dance", kaz: "Билеу", topic: "hobby", days: "16–20" },
+            { id: 185, eng: "Sing", kaz: "Ән айту", topic: "hobby", days: "16–20" },
+            { id: 186, eng: "Draw", kaz: "Сурет салу", topic: "hobby", days: "16–20" },
+            { id: 187, eng: "Skate", kaz: "Коньки тебу", topic: "hobby", days: "16–20" },
+            { id: 188, eng: "Ski", kaz: "Шаңғы тебу", topic: "hobby", days: "16–20" },
+            { id: 189, eng: "Active", kaz: "Белсенді", topic: "hobby", days: "16–20" },
+            { id: 190, eng: "Fast", kaz: "Жылдам", topic: "hobby", days: "16–20" },
+            { id: 191, eng: "Strong", kaz: "Мықты", topic: "hobby", days: "16–20" },
+            { id: 192, eng: "Healthy", kaz: "Денсаулығы мықты", topic: "hobby", days: "16–20" },
+            { id: 193, eng: "Fun", kaz: "Қызықты", topic: "hobby", days: "16–20" },
+            { id: 194, eng: "Fan", kaz: "Жанкүйер", topic: "hobby", days: "16–20" },
+            { id: 195, eng: "Competition", kaz: "Жарыс", topic: "hobby", days: "16–20" },
+            { id: 196, eng: "Champion", kaz: "Чемпион", topic: "hobby", days: "16–20" },
+            { id: 197, eng: "Exercise", kaz: "Жаттығу", topic: "hobby", days: "16–20" },
+            { id: 198, eng: "Walk", kaz: "Серуендеу", topic: "hobby", days: "16–20" },
+            { id: 199, eng: "Outdoor games", kaz: "Даладағы ойындар", topic: "hobby", days: "16–20" },
+            { id: 200, eng: "Board games", kaz: "Үстел ойындары", topic: "hobby", days: "16–20" },
+
+            // NATURE AND WEATHER (50)
+            { id: 201, eng: "Nature", kaz: "Табиғат", topic: "nature", days: "21–25" },
+            { id: 202, eng: "Weather", kaz: "Ауа райы", topic: "nature", days: "21–25" },
+            { id: 203, eng: "Sun", kaz: "Күн", topic: "nature", days: "21–25" },
+            { id: 204, eng: "Moon", kaz: "Ай", topic: "nature", days: "21–25" },
+            { id: 205, eng: "Star", kaz: "Жұлдыз", topic: "nature", days: "21–25" },
+            { id: 206, eng: "Sky", kaz: "Аспан", topic: "nature", days: "21–25" },
+            { id: 207, eng: "Cloud", kaz: "Бұлт", topic: "nature", days: "21–25" },
+            { id: 208, eng: "Rain", kaz: "Жаңбыр", topic: "nature", days: "21–25" },
+            { id: 209, eng: "Snow", kaz: "Қар", topic: "nature", days: "21–25" },
+            { id: 210, eng: "Wind", kaz: "Жел", topic: "nature", days: "21–25" },
+            { id: 211, eng: "Storm", kaz: "Дауыл", topic: "nature", days: "21–25" },
+            { id: 212, eng: "Rainbow", kaz: "Кемпірқосақ", topic: "nature", days: "21–25" },
+            { id: 213, eng: "Hot", kaz: "Ыстық", topic: "nature", days: "21–25" },
+            { id: 214, eng: "Warm", kaz: "Жылы", topic: "nature", days: "21–25" },
+            { id: 215, eng: "Cold", kaz: "Суық", topic: "nature", days: "21–25" },
+            { id: 216, eng: "Cool", kaz: "Салқын", topic: "nature", days: "21–25" },
+            { id: 217, eng: "Sunny", kaz: "Шуақты / Ашық", topic: "nature", days: "21–25" },
+            { id: 218, eng: "Rainy", kaz: "Жаңбырлы", topic: "nature", days: "21–25" },
+            { id: 219, eng: "Snowy", kaz: "Қарлы", topic: "nature", days: "21–25" },
+            { id: 220, eng: "Windy", kaz: "Желді", topic: "nature", days: "21–25" },
+            { id: 221, eng: "Cloudy", kaz: "Бұлтты", topic: "nature", days: "21–25" },
+            { id: 222, eng: "Spring", kaz: "Көктем", topic: "nature", days: "21–25" },
+            { id: 223, eng: "Summer", kaz: "Жаз", topic: "nature", days: "21–25" },
+            { id: 224, eng: "Autumn", kaz: "Күз", topic: "nature", days: "21–25" },
+            { id: 225, eng: "Winter", kaz: "Қыс", topic: "nature", days: "21–25" },
+            { id: 226, eng: "Tree", kaz: "Ағаш", topic: "nature", days: "21–25" },
+            { id: 227, eng: "Flower", kaz: "Гүл", topic: "nature", days: "21–25" },
+            { id: 228, eng: "Grass", kaz: "Шөп", topic: "nature", days: "21–25" },
+            { id: 229, eng: "Forest", kaz: "Орман", topic: "nature", days: "21–25" },
+            { id: 230, eng: "River", kaz: "Өзен", topic: "nature", days: "21–25" },
+            { id: 231, eng: "Lake", kaz: "Көл", topic: "nature", days: "21–25" },
+            { id: 232, eng: "Sea", kaz: "Теңіз", topic: "nature", days: "21–25" },
+            { id: 233, eng: "Ocean", kaz: "Мұхит", topic: "nature", days: "21–25" },
+            { id: 234, eng: "Mountain", kaz: "Тау", topic: "nature", days: "21–25" },
+            { id: 235, eng: "Animal", kaz: "Жануар", topic: "nature", days: "21–25" },
+            { id: 236, eng: "Bird", kaz: "Құс", topic: "nature", days: "21–25" },
+            { id: 237, eng: "Fish", kaz: "Балық", topic: "nature", days: "21–25" },
+            { id: 238, eng: "Plant", kaz: "Өсімдік", topic: "nature", days: "21–25" },
+            { id: 239, eng: "Earth", kaz: "Жер", topic: "nature", days: "21–25" },
+            { id: 240, eng: "Environment", kaz: "Қоршаған орта", topic: "nature", days: "21–25" },
+            { id: 241, eng: "Air", kaz: "Ауа", topic: "nature", days: "21–25" },
+            { id: 242, eng: "Water", kaz: "Су", topic: "nature", days: "21–25" },
+            { id: 243, eng: "Land", kaz: "Жер / Дала", topic: "nature", days: "21–25" },
+            { id: 244, eng: "Ice", kaz: "Мұз", topic: "nature", days: "21–25" },
+            { id: 245, eng: "Fog", kaz: "Тұман", topic: "nature", days: "21–25" },
+            { id: 246, eng: "Climate", kaz: "Климат", topic: "nature", days: "21–25" },
+            { id: 247, eng: "Park", kaz: "Саябақ", topic: "nature", days: "21–25" },
+            { id: 248, eng: "Field", kaz: "Дала / Алқап", topic: "nature", days: "21–25" },
+            { id: 249, eng: "Beautiful", kaz: "Әдемі", topic: "nature", days: "21–25" },
+            { id: 250, eng: "Clean", kaz: "Таза", topic: "nature", days: "21–25" },
+
+            // TRAVEL AND EVERYDAY ENGLISH (50)
+            { id: 251, eng: "Travel", kaz: "Саяхат", topic: "travel", days: "26–30" },
+            { id: 252, eng: "Trip", kaz: "Сапар", topic: "travel", days: "26–30" },
+            { id: 253, eng: "Journey", kaz: "Жол / Саяхат", topic: "travel", days: "26–30" },
+            { id: 254, eng: "City", kaz: "Қала", topic: "travel", days: "26–30" },
+            { id: 255, eng: "Town", kaz: "Шағын қала", topic: "travel", days: "26–30" },
+            { id: 256, eng: "Village", kaz: "Ауыл", topic: "travel", days: "26–30" },
+            { id: 257, eng: "Country", kaz: "Ел / Мемлекет", topic: "travel", days: "26–30" },
+            { id: 258, eng: "Hotel", kaz: "Қонақ үй", topic: "travel", days: "26–30" },
+            { id: 259, eng: "Airport", kaz: "Әуежай", topic: "travel", days: "26–30" },
+            { id: 260, eng: "Train station", kaz: "Вокзал", topic: "travel", days: "26–30" },
+            { id: 261, eng: "Bus", kaz: "Автобус", topic: "travel", days: "26–30" },
+            { id: 262, eng: "Train", kaz: "Пойыз", topic: "travel", days: "26–30" },
+            { id: 263, eng: "Plane", kaz: "Ұшақ", topic: "travel", days: "26–30" },
+            { id: 264, eng: "Car", kaz: "Көлік", topic: "travel", days: "26–30" },
+            { id: 265, eng: "Taxi", kaz: "Такси", topic: "travel", days: "26–30" },
+            { id: 266, eng: "Ticket", kaz: "Билет", topic: "travel", days: "26–30" },
+            { id: 267, eng: "Passport", kaz: "Төлқұжат", topic: "travel", days: "26–30" },
+            { id: 268, eng: "Luggage", kaz: "Жүк", topic: "travel", days: "26–30" },
+            { id: 269, eng: "Map", kaz: "Карта", topic: "travel", days: "26–30" },
+            { id: 270, eng: "Street", kaz: "Көше", topic: "travel", days: "26–30" },
+            { id: 271, eng: "Road", kaz: "Жол", topic: "travel", days: "26–30" },
+            { id: 272, eng: "Place", kaz: "Орын", topic: "travel", days: "26–30" },
+            { id: 273, eng: "Visit", kaz: "Аралау / Бару", topic: "travel", days: "26–30" },
+            { id: 274, eng: "Hello", kaz: "Сәлем", topic: "travel", days: "26–30" },
+            { id: 275, eng: "Goodbye", kaz: "Сау болыңыз", topic: "travel", days: "26–30" },
+            { id: 276, eng: "Please", kaz: "Өтініш", topic: "travel", days: "26–30" },
+            { id: 277, eng: "Thank you", kaz: "Рақмет", topic: "travel", days: "26–30" },
+            { id: 278, eng: "Sorry", kaz: "Кешіріңіз", topic: "travel", days: "26–30" },
+            { id: 279, eng: "Help", kaz: "Көмек", topic: "travel", days: "26–30" },
+            { id: 280, eng: "Stop", kaz: "Тоқта", topic: "travel", days: "26–30" },
+            { id: 281, eng: "Go", kaz: "Жүру / Бару", topic: "travel", days: "26–30" },
+            { id: 282, eng: "Turn left", kaz: "Солға бұрылу", topic: "travel", days: "26–30" },
+            { id: 283, eng: "Turn right", kaz: "Оңға бұрылу", topic: "travel", days: "26–30" },
+            { id: 284, eng: "Where is", kaz: "Қайда", topic: "travel", days: "26–30" },
+            { id: 285, eng: "How much", kaz: "Қанша тұрады", topic: "travel", days: "26–30" },
+            { id: 286, eng: "Open", kaz: "Ашық", topic: "travel", days: "26–30" },
+            { id: 287, eng: "Closed", kaz: "Жабық", topic: "travel", days: "26–30" },
+            { id: 288, eng: "Good", kaz: "Жақсы", topic: "travel", days: "26–30" },
+            { id: 289, eng: "Bad", kaz: "Жаман", topic: "travel", days: "26–30" },
+            { id: 290, eng: "Big", kaz: "Үлкен", topic: "travel", days: "26–30" },
+            { id: 291, eng: "Small", kaz: "Кішкентай", topic: "travel", days: "26–30" },
+            { id: 292, eng: "Near", kaz: "Жақын", topic: "travel", days: "26–30" },
+            { id: 293, eng: "Far", kaz: "Қашық", topic: "travel", days: "26–30" },
+            { id: 294, eng: "Friend", kaz: "Дос", topic: "travel", days: "26–30" },
+            { id: 295, eng: "People", kaz: "Адамдар", topic: "travel", days: "26–30" },
+            { id: 296, eng: "Today", kaz: "Бүгін", topic: "travel", days: "26–30" },
+            { id: 297, eng: "Tomorrow", kaz: "Ертең", topic: "travel", days: "26–30" },
+            { id: 298, eng: "Time", kaz: "Уақыт", topic: "travel", days: "26–30" },
+            { id: 299, eng: "Money", kaz: "Ақша", topic: "travel", days: "26–30" },
+            { id: 300, eng: "Welcome", kaz: "Қош келдіңіз", topic: "travel", days: "26–30" }
+        ];
+
+        // Specific Test Questions Datasets
+        const task1Data = [
+            { id: 1, eng: 'Parents', ans: ['ата-ана', 'ата ана', 'ата-анасы'] },
+            { id: 2, eng: 'Sister', ans: ['әпке', 'қарындас', 'сіңлі'] },
+            { id: 3, eng: 'Student', ans: ['оқушы', 'студент'] },
+            { id: 4, eng: 'Lesson', ans: ['сабақ'] },
+            { id: 5, eng: 'Notebook', ans: ['дәптер', 'блокнот'] },
+            { id: 6, eng: 'Breakfast', ans: ['таңғы ас'] },
+            { id: 7, eng: 'Banana', ans: ['банан'] },
+            { id: 8, eng: 'Juice', ans: ['шырын', 'сок'] },
+            { id: 9, eng: 'Swimming', ans: ['жүзу', 'жүзу спорты'] },
+            { id: 10, eng: 'Holiday', ans: ['демалыс', 'мереке', 'каникул'] }
+        ];
+
+        const task2Data = [
+            { id: 11, word: 'Father', options: ['әке', 'аға', 'ата'], correct: 0 },
+            { id: 12, word: 'Library', options: ['асхана', 'кітапхана', 'мектеп'], correct: 1 },
+            { id: 13, word: 'Homework', options: ['үй жұмысы', 'сабақ', 'демалыс'], correct: 0 },
+            { id: 14, word: 'Early', options: ['кеш', 'ерте', 'баяу'], correct: 1 },
+            { id: 15, word: 'Drink', options: ['жеу', 'оқу', 'ішу'], correct: 2 },
+            { id: 16, word: 'Strong', options: ['әлсіз', 'мықты', 'кішкентай'], correct: 1 },
+            { id: 17, word: 'Flower', options: ['ағаш', 'өзен', 'гүл'], correct: 2 },
+            { id: 18, word: 'Rainy', options: ['жаңбырлы', 'шуақты', 'қарлы'], correct: 0 },
+            { id: 19, word: 'Drawing', options: ['ән айту', 'сурет салу', 'жүгіру'], correct: 1 },
+            { id: 20, word: 'Mountain', options: ['теңіз', 'тау', 'көл'], correct: 1 }
+        ];
+
+        const task3Data = [
+            { num: 21, kaz: 'әке', trans: 'father' },
+            { num: 22, kaz: 'оқушы', trans: 'student' },
+            { num: 23, kaz: 'кітапхана', trans: 'library' },
+            { num: 24, kaz: 'сабақ', trans: 'lesson' },
+            { num: 25, kaz: 'таңғы ас', trans: 'breakfast' },
+            { num: 26, kaz: 'банан', trans: 'banana' },
+            { num: 27, kaz: 'шырын', trans: 'juice' },
+            { num: 28, kaz: 'жүгіру', trans: 'run', altTrans: 'running' },
+            { num: 29, kaz: 'гүл', trans: 'flower' },
+            { num: 30, kaz: 'тау', trans: 'mountain' }
+        ];
+
+        let currentFilteredWords = [...fullVocabulary];
+        let currentCardIndex = 0;
+
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('test-date');
+            if (dateInput) dateInput.valueAsDate = new Date();
+
+            renderWordsList();
+            renderTaskInputs();
+            renderDashboardTable();
+        });
+
+        // Navigation Switcher
+        function switchTab(tab) {
+            const btnLearn = document.getElementById('tab-learn');
+            const btnTest = document.getElementById('tab-test');
+            const btnDashboard = document.getElementById('tab-dashboard');
+
+            const viewLearn = document.getElementById('view-learn');
+            const viewTest = document.getElementById('view-test');
+            const viewDashboard = document.getElementById('view-dashboard');
+
+            const activeClass = "px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 bg-white text-indigo-900 shadow";
+            const inactiveClass = "px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 text-indigo-100 hover:text-white";
+
+            viewLearn.classList.add('hidden');
+            viewTest.classList.add('hidden');
+            viewDashboard.classList.add('hidden');
+
+            btnLearn.className = inactiveClass;
+            btnTest.className = inactiveClass;
+            btnDashboard.className = inactiveClass;
+
+            if (tab === 'learn') {
+                viewLearn.classList.remove('hidden');
+                btnLearn.className = activeClass;
+            } else if (tab === 'test') {
+                viewTest.classList.remove('hidden');
+                btnTest.className = activeClass;
+            } else {
+                viewDashboard.classList.remove('hidden');
+                btnDashboard.className = activeClass;
+                renderDashboardTable();
+            }
+        }
+
+        // Learn View Toggle (List vs Cards)
+        function setLearnView(mode) {
+            const listContainer = document.getElementById('words-list-container');
+            const cardsContainer = document.getElementById('words-cards-container');
+            const btnList = document.getElementById('mode-list-btn');
+            const btnCards = document.getElementById('mode-cards-btn');
+
+            if (mode === 'list') {
+                listContainer.classList.remove('hidden');
+                cardsContainer.classList.add('hidden');
+                btnList.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-indigo-900 shadow";
+                btnCards.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-white hover:bg-white/10";
+            } else {
+                listContainer.classList.add('hidden');
+                cardsContainer.classList.remove('hidden');
+                btnCards.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-indigo-900 shadow";
+                btnList.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-white hover:bg-white/10";
+                updateCard();
+            }
+        }
+
+        function filterWords() {
+            const topic = document.getElementById('topic-select').value;
+            const search = document.getElementById('search-input').value.trim().toLowerCase();
+
+            currentFilteredWords = fullVocabulary.filter(item => {
+                const matchTopic = (topic === 'all' || item.topic === topic);
+                const matchSearch = item.eng.toLowerCase().includes(search) || item.kaz.toLowerCase().includes(search);
+                return matchTopic && matchSearch;
+            });
+
+            currentCardIndex = 0;
+            renderWordsList();
+            updateCard();
+        }
+
+        function renderWordsList() {
+            const container = document.getElementById('words-list-container');
+            if (currentFilteredWords.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400">Сөз табылған жоқ</div>`;
+                return;
+            }
+
+            container.innerHTML = currentFilteredWords.map(item => `
+                <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:border-indigo-300 transition-all flex items-center justify-between gap-2">
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-bold text-slate-800 text-sm">${item.eng}</span>
+                            <button onclick="speakWord('${item.eng}')" title="Дыбыстау" class="text-indigo-600 hover:text-indigo-800 p-1 text-xs">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                        <span class="text-xs text-slate-500 block mt-0.5">${item.kaz}</span>
+                    </div>
+                    <span class="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-semibold rounded">${item.days}-күн</span>
+                </div>
+            `).join('');
+        }
+
+        // Flashcards Logic
+        function updateCard() {
+            if (currentFilteredWords.length === 0) return;
+            const item = currentFilteredWords[currentCardIndex];
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.remove('flipped');
+
+            document.getElementById('card-eng').innerText = item.eng;
+            document.getElementById('card-kaz').innerText = item.kaz;
+            document.getElementById('card-topic').innerText = `${item.days} Күн • ${item.topic.toUpperCase()}`;
+            document.getElementById('card-counter').innerText = `${currentCardIndex + 1} / ${currentFilteredWords.length}`;
+        }
+
+        function nextCard() {
+            if (currentFilteredWords.length === 0) return;
+            currentCardIndex = (currentCardIndex + 1) % currentFilteredWords.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            if (currentFilteredWords.length === 0) return;
+            currentCardIndex = (currentCardIndex - 1 + currentFilteredWords.length) % currentFilteredWords.length;
+            updateCard();
+        }
+
+        function renderTaskInputs() {
+            // Task 1
+            const t1Container = document.getElementById('task1-container');
+            t1Container.innerHTML = task1Data.map(item => `
+                <div class="flex items-center justify-between gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="speakWord('${item.eng}')" title="Дыбыстау" 
+                            class="text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-100 rounded-lg transition-colors">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <span class="font-bold text-slate-700 text-sm">${item.id}. ${item.eng}</span>
+                    </div>
+                    <input type="text" id="t1_${item.id}" placeholder="аудармасы" required
+                        class="w-1/2 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+            `).join('');
+
+            // Task 2
+            const t2Container = document.getElementById('task2-container');
+            t2Container.innerHTML = task2Data.map(item => {
+                let optsHTML = item.options.map((opt, idx) => {
+                    const letter = String.fromCharCode(65 + idx);
+                    return `
+                        <label class="flex items-center gap-2 p-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-indigo-50/50 text-xs font-medium text-slate-700 bg-white">
+                            <input type="radio" name="t2_${item.id}" value="${idx}" required class="text-indigo-600 focus:ring-indigo-500">
+                            <span><strong>${letter})</strong> ${opt}</span>
+                        </label>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-700 text-sm">${item.id}. ${item.word}</span>
+                            <button type="button" onclick="speakWord('${item.word}')" title="Дыбыстау" class="text-indigo-600 hover:text-indigo-800 text-xs">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            ${optsHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Task 3
+            const t3Container = document.getElementById('task3-container');
+            t3Container.innerHTML = task3Data.map(item => `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+                        <span class="font-bold text-slate-800 text-sm">${item.num}. ${item.kaz}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-500">Ағылшынша:</span>
+                            <input type="text" id="t3_trans_${item.num}" placeholder="${item.trans}" required
+                                class="px-2.5 py-1 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none w-36">
+                        </div>
+                    </div>
+                    <div>
+                        <input type="text" id="t3_sent_${item.num}" placeholder="Сөйлем жазыңыз (мысалы: My ${item.trans} is...)" required
+                            class="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function submitQuiz() {
+            const name = document.getElementById('student-name').value.trim();
+            const groupEl = document.querySelector('input[name="student-group"]:checked');
+            if (!name || !groupEl) {
+                alert('Өтініш, оқушының атын және тобын толық таңдаңыз!');
+                return;
+            }
+
+            const group = groupEl.value;
+            let scoreT1 = 0;
+            let scoreT2 = 0;
+            let scoreT3 = 0;
+
+            // Task 1 Evaluation
+            task1Data.forEach(item => {
+                const val = document.getElementById(`t1_${item.id}`).value.trim().toLowerCase();
+                if (item.ans.some(correct => val.includes(correct.toLowerCase()))) {
+                    scoreT1++;
+                }
+            });
+
+            // Task 2 Evaluation
+            task2Data.forEach(item => {
+                const selected = document.querySelector(`input[name="t2_${item.id}"]:checked`);
+                if (selected && parseInt(selected.value) === item.correct) {
+                    scoreT2++;
+                }
+            });
+
+            // Task 3 Evaluation
+            task3Data.forEach(item => {
+                const transVal = document.getElementById(`t3_trans_${item.num}`).value.trim().toLowerCase();
+                const sentVal = document.getElementById(`t3_sent_${item.num}`).value.trim().toLowerCase();
+                
+                const targetWord = item.trans.toLowerCase();
+                const altWord = item.altTrans ? item.altTrans.toLowerCase() : targetWord;
+
+                const isTransCorrect = (transVal === targetWord || transVal === altWord);
+                const isWordInSentence = sentVal.includes(targetWord) || sentVal.includes(altWord);
+                const isSentenceValid = sentVal.length > (targetWord.length + 3);
+
+                if (isTransCorrect && isWordInSentence && isSentenceValid) {
+                    scoreT3++;
+                }
+            });
+
+            const totalScore = scoreT1 + scoreT2 + scoreT3;
+
+            let level = '';
+            let description = '';
+            let levelClass = '';
+
+            if (totalScore >= 25) {
+                level = 'Жоғары';
+                description = 'Оқушының 300 сөздік қоры өте жақсы қалыптасқан.';
+                levelClass = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+            } else if (totalScore >= 18) {
+                level = 'Орташа';
+                description = 'Сөздік қоры орташа деңгейде, қосымша жаттығу қажет.';
+                levelClass = 'bg-amber-100 text-amber-800 border-amber-300';
+            } else {
+                level = 'Төмен';
+                description = 'Сөздік қорын қайтадан толықтыру қажет.';
+                levelClass = 'bg-rose-100 text-rose-800 border-rose-300';
+            }
+
+            document.getElementById('res-t1').innerText = `${scoreT1} / 10`;
+            document.getElementById('res-t2').innerText = `${scoreT2} / 10`;
+            document.getElementById('res-t3').innerText = `${scoreT3} / 10`;
+            document.getElementById('res-total').innerText = `${totalScore} / 30`;
+            
+            const lvlTag = document.getElementById('res-level-tag');
+            lvlTag.innerText = level;
+            lvlTag.className = `px-3 py-1 rounded-full text-xs font-bold border ${levelClass}`;
+            
+            document.getElementById('res-description').innerText = description;
+
+            document.getElementById('quiz-form').classList.add('hidden');
+            document.getElementById('result-modal').classList.remove('hidden');
+
+            saveResult({
+                id: Date.now(),
+                name: name,
+                group: group,
+                t1: scoreT1,
+                t2: scoreT2,
+                t3: scoreT3,
+                total: totalScore,
+                level: level
+            });
+        }
+
+        function resetTest() {
+            document.getElementById('quiz-form').reset();
+            document.getElementById('quiz-form').classList.remove('hidden');
+            document.getElementById('result-modal').classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // LocalStorage & Dashboard Logic
+        function getSavedResults() {
+            return JSON.parse(localStorage.getItem('english_experiment_results') || '[]');
+        }
+
+        function saveResult(data) {
+            const results = getSavedResults();
+            results.push(data);
+            localStorage.setItem('english_experiment_results', JSON.stringify(results));
+        }
+
+        function deleteResult(id) {
+            let results = getSavedResults();
+            results = results.filter(item => item.id !== id);
+            localStorage.setItem('english_experiment_results', JSON.stringify(results));
+            renderDashboardTable();
+        }
+
+        function clearResults() {
+            if (confirm('Бүкіл нәтижелерді жойғыңыз келе ме?')) {
+                localStorage.removeItem('english_experiment_results');
+                renderDashboardTable();
+            }
+        }
+
+        function addSampleData() {
+            const samples = [
+                { id: 1, name: 'Арман Қайратов', group: 'Эксперименттік топ', t1: 9, t2: 10, t3: 8, total: 27, level: 'Жоғары' },
+                { id: 2, name: 'Аружан Серікова', group: 'Эксперименттік топ', t1: 10, t2: 9, t3: 9, total: 28, level: 'Жоғары' },
+                { id: 3, name: 'Данияр Нұрланов', group: 'Эксперименттік топ', t1: 8, t2: 8, t3: 8, total: 24, level: 'Орташа' },
+                { id: 4, name: 'Динара Әлібекова', group: 'Бақылау тобы', t1: 6, t2: 7, t3: 5, total: 18, level: 'Орташа' },
+                { id: 5, name: 'Ерасыл Болатов', group: 'Бақылау тобы', t1: 5, t2: 6, t3: 4, total: 15, level: 'Төмен' },
+                { id: 6, name: 'Мадияр Оспанов', group: 'Бақылау тобы', t1: 7, t2: 6, t3: 6, total: 19, level: 'Орташа' }
+            ];
+            localStorage.setItem('english_experiment_results', JSON.stringify(samples));
+            renderDashboardTable();
+        }
+
+        function renderDashboardTable() {
+            const results = getSavedResults();
+            const tbody = document.getElementById('results-table-body');
+            const emptyMsg = document.getElementById('empty-table-msg');
+
+            tbody.innerHTML = '';
+
+            if (results.length === 0) {
+                emptyMsg.classList.remove('hidden');
+            } else {
+                emptyMsg.classList.add('hidden');
+            }
+
+            let expTotal = 0, expCount = 0;
+            let ctrlTotal = 0, ctrlCount = 0;
+
+            results.forEach((item, index) => {
+                if (item.group === 'Эксперименттік топ') {
+                    expTotal += item.total;
+                    expCount++;
+                } else {
+                    ctrlTotal += item.total;
+                    ctrlCount++;
+                }
+
+                let badgeColor = 'bg-slate-100 text-slate-700';
+                if (item.level === 'Жоғары') badgeColor = 'bg-emerald-100 text-emerald-800';
+                else if (item.level === 'Орташа') badgeColor = 'bg-amber-100 text-amber-800';
+                else if (item.level === 'Төмен') badgeColor = 'bg-rose-100 text-rose-800';
+
+                const groupBadge = item.group === 'Эксперименттік топ' 
+                    ? '<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-indigo-100 text-indigo-800">Эксперименттік</span>'
+                    : '<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-700">Бақылау</span>';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4 text-center font-bold text-slate-400 text-xs">${index + 1}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${item.name}</td>
+                        <td class="py-3 px-4">${groupBadge}</td>
+                        <td class="py-3 px-4 text-center text-slate-600">${item.t1}</td>
+                        <td class="py-3 px-4 text-center text-slate-600">${item.t2}</td>
+                        <td class="py-3 px-4 text-center text-slate-600">${item.t3}</td>
+                        <td class="py-3 px-4 text-center font-bold text-indigo-700">${item.total}</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeColor}">${item.level}</span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="deleteResult(${item.id})" title="Өшіру" class="text-slate-400 hover:text-rose-600 transition-colors">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const expAvg = expCount > 0 ? (expTotal / expCount) : 0;
+            const expPercent = ((expAvg / 30) * 100).toFixed(1);
+
+            const ctrlAvg = ctrlCount > 0 ? (ctrlTotal / ctrlCount) : 0;
+            const ctrlPercent = ((ctrlAvg / 30) * 100).toFixed(1);
+
+            document.getElementById('exp-avg-score').innerText = `${expAvg.toFixed(1)} / 30`;
+            document.getElementById('exp-count').innerText = `Оқушы саны: ${expCount}`;
+            document.getElementById('exp-percent').innerText = `${expPercent}%`;
+
+            document.getElementById('ctrl-avg-score').innerText = `${ctrlAvg.toFixed(1)} / 30`;
+            document.getElementById('ctrl-count').innerText = `Оқушы саны: ${ctrlCount}`;
+            document.getElementById('ctrl-percent').innerText = `${ctrlPercent}%`;
+        }
+
+        function exportCSV() {
+            const results = getSavedResults();
+            if (results.length === 0) {
+                alert('Экспорттау үшін деректер жоқ!');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "№,Оқушы,Тобы,1-тапсырма,2-тапсырма,3-тапсырма,Жалпы балл,Деңгей\n";
+
+            results.forEach((item, idx) => {
+                csvContent += `"${idx + 1}","${item.name}","${item.group}","${item.t1}","${item.t2}","${item.t3}","${item.total}","${item.level}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Vocabulary_Experiment_Results_300Words.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
